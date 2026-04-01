@@ -34,10 +34,6 @@ async function makeApiRequest(
   return response.json();
 }
 
-// ---------------------------------------------------------------------------
-// Validation helpers mirrored from the tool handler
-// ---------------------------------------------------------------------------
-
 function validateSubmitIssue(args: Record<string, unknown>) {
   if (typeof args.title !== "string" || (args.title as string).trim().length === 0)
     throw new Error("Invalid input: 'title' must be a non-empty string");

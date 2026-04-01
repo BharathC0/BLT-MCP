@@ -225,10 +225,16 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
         break;
 
       case "leaderboards":
+        if (resourceId) {
+          throw new Error(`leaderboards resource does not support individual lookup by ID`);
+        }
         data = await makeApiRequest("/leaderboards");
         break;
 
       case "rewards":
+        if (resourceId) {
+          throw new Error(`rewards resource does not support individual lookup by ID`);
+        }
         data = await makeApiRequest("/rewards");
         break;
 
@@ -414,9 +420,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case "submit_issue": {
+        if (typeof args.title !== "string" || (args.title as string).trim().length === 0) {
+          throw new Error("Invalid input: 'title' must be a non-empty string");
+        }
+        if (typeof args.description !== "string" || (args.description as string).trim().length === 0) {
+          throw new Error("Invalid input: 'description' must be a non-empty string");
+        }
+        if ((args.title as string).trim().length > 255) {
+          throw new Error("Invalid input: 'title' must be 255 characters or fewer");
+        }
+
         const result = await makeApiRequest("/issues", "POST", {
-          title: args.title,
-          description: args.description,
+          title: (args.title as string).trim(),
+          description: (args.description as string).trim(),
           repo_id: args.repo_id,
           severity: args.severity || "medium",
           type: args.type || "bug",
@@ -433,10 +449,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "award_bacon": {
+        if (typeof args.contributor_id !== "string" || (args.contributor_id as string).trim().length === 0) {
+          throw new Error("Invalid input: 'contributor_id' must be a non-empty string");
+        }
+        if (typeof args.points !== "number" || (args.points as number) <= 0) {
+          throw new Error("Invalid input: 'points' must be a positive number");
+        }
+        if (typeof args.reason !== "string" || (args.reason as string).trim().length === 0) {
+          throw new Error("Invalid input: 'reason' must be a non-empty string");
+        }
+
         const result = await makeApiRequest("/rewards", "POST", {
-          contributor_id: args.contributor_id,
+          contributor_id: (args.contributor_id as string).trim(),
           points: args.points,
-          reason: args.reason,
+          reason: (args.reason as string).trim(),
         });
 
         return {
@@ -450,8 +476,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "update_issue_status": {
+        if (typeof args.issue_id !== "string" || (args.issue_id as string).trim().length === 0) {
+          throw new Error("Invalid input: 'issue_id' must be a non-empty string");
+        }
+        const validStatuses = ["open", "in_progress", "resolved", "closed", "wont_fix"];
+        if (typeof args.status !== "string" || !validStatuses.includes(args.status as string)) {
+          throw new Error(`Invalid input: 'status' must be one of: ${validStatuses.join(", ")}`);
+        }
+
         const result = await makeApiRequest(
-          `/issues/${args.issue_id}`,
+          `/issues/${encodeURIComponent(args.issue_id as string)}`,
           "PATCH",
           {
             status: args.status,
@@ -470,11 +504,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "add_comment": {
+        if (typeof args.issue_id !== "string" || (args.issue_id as string).trim().length === 0) {
+          throw new Error("Invalid input: 'issue_id' must be a non-empty string");
+        }
+        if (typeof args.comment !== "string" || (args.comment as string).trim().length === 0) {
+          throw new Error("Invalid input: 'comment' must be a non-empty string");
+        }
+
         const result = await makeApiRequest(
-          `/issues/${args.issue_id}/comments`,
+          `/issues/${encodeURIComponent(args.issue_id as string)}/comments`,
           "POST",
           {
-            comment: args.comment,
+            comment: (args.comment as string).trim(),
           }
         );
 

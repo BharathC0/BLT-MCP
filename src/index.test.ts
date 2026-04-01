@@ -1,17 +1,5 @@
-/**
- * BLT-MCP Test Suite
- *
- * Tests for the validation logic, resource routing, and tool behaviour
- * of the BLT-MCP server. API calls are mocked via globalThis.fetch so
- * no real network access is required.
- */
-
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-// ---------------------------------------------------------------------------
-// Helpers that mirror the logic in src/index.ts so we can unit-test them
-// without spinning up a full MCP server.
-// ---------------------------------------------------------------------------
 
 interface ApiRequestBody {
   [key: string]: unknown;
@@ -94,10 +82,6 @@ function resolveResourceEndpoint(resourceType: string, resourceId?: string): str
   }
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
 describe("makeApiRequest", () => {
   beforeEach(() => {
     vi.stubGlobal(
@@ -135,8 +119,6 @@ describe("makeApiRequest", () => {
     await expect(makeApiRequest("/missing")).rejects.toThrow("API request failed: 404 Not Found");
   });
 });
-
-// ---------------------------------------------------------------------------
 describe("Resource routing — resolveResourceEndpoint", () => {
   it("returns /leaderboards for leaderboards resource", () => {
     expect(resolveResourceEndpoint("leaderboards")).toBe("/leaderboards");
@@ -177,7 +159,6 @@ describe("Resource routing — resolveResourceEndpoint", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 describe("Tool validation — submit_issue", () => {
   it("passes with valid args", () => {
     expect(() =>
@@ -209,8 +190,6 @@ describe("Tool validation — submit_issue", () => {
     ).toThrow("'title' must be 255 characters or fewer");
   });
 });
-
-// ---------------------------------------------------------------------------
 describe("Tool validation — award_bacon", () => {
   it("passes with valid args", () => {
     expect(() =>
@@ -243,7 +222,6 @@ describe("Tool validation — award_bacon", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 describe("Tool validation — update_issue_status", () => {
   it("passes with valid status", () => {
     expect(() =>
@@ -272,8 +250,6 @@ describe("Tool validation — update_issue_status", () => {
     }
   });
 });
-
-// ---------------------------------------------------------------------------
 describe("Tool validation — add_comment", () => {
   it("passes with valid args", () => {
     expect(() =>

@@ -6,7 +6,7 @@
  * no real network access is required.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Helpers that mirror the logic in src/index.ts so we can unit-test them
@@ -113,6 +113,10 @@ describe("makeApiRequest", () => {
     );
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it("calls the correct URL", async () => {
     await makeApiRequest("/issues");
     expect(fetch).toHaveBeenCalledWith(
@@ -138,7 +142,7 @@ describe("makeApiRequest", () => {
 
 // ---------------------------------------------------------------------------
 describe("Resource routing — resolveResourceEndpoint", () => {
-  it("returns /issues for leaderboards resource", () => {
+  it("returns /leaderboards for leaderboards resource", () => {
     expect(resolveResourceEndpoint("leaderboards")).toBe("/leaderboards");
   });
 

@@ -483,9 +483,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (typeof args.status !== "string" || !validStatuses.includes(args.status as string)) {
           throw new Error(`Invalid input: 'status' must be one of: ${validStatuses.join(", ")}`);
         }
+        const issueId = (args.issue_id as string).trim();
 
         const result = await makeApiRequest(
-          `/issues/${encodeURIComponent(args.issue_id as string)}`,
+          `/issues/${encodeURIComponent(issueId)}`,
           "PATCH",
           {
             status: args.status,
@@ -510,9 +511,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (typeof args.comment !== "string" || (args.comment as string).trim().length === 0) {
           throw new Error("Invalid input: 'comment' must be a non-empty string");
         }
+        const issueId = (args.issue_id as string).trim();
 
         const result = await makeApiRequest(
-          `/issues/${encodeURIComponent(args.issue_id as string)}/comments`,
+          `/issues/${encodeURIComponent(issueId)}/comments`,
           "POST",
           {
             comment: (args.comment as string).trim(),
